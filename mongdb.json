@@ -1,0 +1,11 @@
+[
+{"_id": 5,"name": "Apple Watch Series 7","category": "Electronics","description": "Advanced smartwatch from Apple", "price": 399,"in_stock": true},
+
+{"_id": 6,"name": "Nike Air Max 90","category": "Shoes","description": "Classic sneakers from Nike","price": 120,"in_stock": true},
+
+{"_id": 7,"name": "Levi's 501 Jeans","category": "Clothing,"description": "smartphone from Samsung","price": 799,"in_stock": true},
+
+{"_id": 8,"name": "Bose QuietComfort Earbuds","category": "Electronics","description": "Wireless noise-cancelling earbuds from Bose","price": 279,"in_stock": true},
+
+{"_id": 9,"name": "Nintendo Switch","category": "Gaming","description": "Hybrid gaming console from Nintendo","price": 299,"in_stock": false}
+]

@@ -1,0 +1,102 @@
+building a social network that connects people based on their interests.
+
+Each person has a name and a list of interests, and there are relationships between people based on shared interests
+
+To create this graph in Neo4j, we can create nodes for each person and each interest, and create relationships between people based on shared interests.
+
+// create nodes for people
+CREATE (ope:Person {name: 'Ope'})
+CREATE (grace:Person {name: 'Grace'})
+CREATE (charlie:Person {name: 'Charlie'})
+CREATE (david:Person {name: 'David'})
+
+// create nodes for interests
+CREATE (sleeping:Interest {name: 'Sleeping'})
+CREATE (singing:Interest {name: 'Singing'})
+CREATE (biking:Interest {name: 'Biking'})
+CREATE (reading:Interest {name: 'Reading'})
+CREATE (coding:Interest {name: 'Coding'})
+
+// create relationships between people and interests
+MATCH (p:Person {name: 'Ope'}), (i:Interest {name: 'Sleeping'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'David'}), (i:Interest {name: 'Coding'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'Grace'}), (i:Interest {name: 'Biking'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'Charlie'}), (i:Interest {name: 'Singing'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'Charlie'}), (i:Interest {name: 'Biking'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'David'}), (i:Interest {name: 'Reading'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p:Person {name: 'David'}), (i:Interest {name: 'Coding'})
+CREATE (p)-[:LIKES]->(i)
+
+MATCH (p1:Person {name: 'Ope'}), (p2:Person {name: 'Grace'}), (i:Interest {name: 'Coding'})
+CREATE (p1)-[:SHARES_INTEREST]->(p2)-[:SHARES_INTEREST]->(i)
+
+MATCH (p1:Person {name: 'David'}), (p2:Person {name: 'Charlie'}), (i:Interest {name: 'Biking'})
+CREATE (p1)-[:SHARES_INTEREST]->(p2)-[:SHARES_INTEREST]->(i)
+
+This creates 4 person nodes, 5 interest nodes, and 8 relationships between them.
+
+
+
+Query 1: Retrieve all the people who like biking.
+MATCH (p:Person)-[:LIKES]->(i:Interest {name: 'Biking'})
+RETURN p
+
+Query 2: Retrieve all the people who like rock coding and biking.
+MATCH (p:Person)-[:LIKES]->(i:Interest {name: 'Coding'})
+MATCH (p)-[:LIKES]->
+
+Query 3: Retrieve all the interests that Grace likes.
+MATCH (p:Person {name: 'Grace'})-[:LIKES]->(i:Interest)
+RETURN i
+
+Query 4: Retrieve all the people who share an interest with David.
+MATCH (p1:Person {name: 'David'})-[:SHARES_INTEREST]->(p2:Person)-[:SHARES_INTEREST]->(i:Interest)
+RETURN p2
+
+Query 5: Retrieve all the interests that are shared by Ope and Charles.
+MATCH (p1:Person {name: 'Ope'})-[:SHARES_INTEREST]->(p2:Person {name: 'Charles'})-[:SHARES_INTEREST]->(i:Interest)
+RETURN i
+
+
+Query 6: Retrieve all the people who share an interest with David and Grace.
+MATCH (p1:Person {name: 'David'})-[:SHARES_INTEREST]->(p2:Person {name: 'Grace'})-[:SHARES_INTEREST]->(i:Interest)<-[:LIKES]-(p:Person)
+RETURN p
+
+
+Query 7: Retrieve all the people who share more than one interest with Ope.
+MATCH (p1:Person {name: 'Ope'})-[:SHARES_INTEREST]->(p2:Person)-[:SHARES_INTEREST]->(i:Interest)<-[:LIKES]-(p:Person)
+WHERE p <> p1 AND p <> p2
+WITH p, COUNT(DISTINCT i) AS num_shared_interests
+WHERE num_shared_interests > 1
+RETURN p
+
+
+Query 8: Retrieve all the interests that are liked by at least 2 people.
+MATCH (p1:Person)-[:LIKES]->(i:Interest)<-[:LIKES]-(p2:Person)
+WHERE p1 <> p2
+RETURN i
+
+
+Query 9: Retrieve all the people who like coding and share an interest with David.
+MATCH (p:Person)-[:LIKES]->(i1:Interest {name: 'Coding'})
+MATCH (p)-[:SHARES_INTEREST]->(:Person {name: 'David'})-[:SHARES_INTEREST]->(i2:Interest)
+WHERE i1 = i2
+RETURN p
+
+Query 10: Retrieve all the interests that are liked by people who share an interest with Grace.
+MATCH (p1:Person {name: 'Grace'})-[:SHARES_INTEREST]->(p2:Person)-[:LIKES]->(i:Interest)
+WITH i, COUNT(DISTINCT p2) AS num_people
+WHERE num_people > 1
+RETURN i
